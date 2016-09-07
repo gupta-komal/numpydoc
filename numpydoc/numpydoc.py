@@ -183,6 +183,31 @@ class NumpyCDomain(ManglingDomainBase, CDomain):
     }
 
 
+def match_items(lines, content_old):
+    """Create the right items for lines.
+
+    This tries to recover where a line in ``lines``
+    came from before mangling.
+
+    It assumes that missing or new lines
+    are always empty.
+    """
+    items_new = []
+    lines_old = content_old.data
+    items_old = content_old.items
+    j = 0
+    for i, line in enumerate(lines):
+        # go to next non-empty line in old:
+        # line.strip("") checks whether the string is all whitespace
+        while j < len(lines_old) - 1 and not lines_old[j].strip(" "):
+            j += 1
+        items_new.append(items_old[j])
+        if line.strip(" ") and j < len(lines_old) - 1:
+            j += 1
+    assert(len(items_new) == len(lines))
+    return items_new
+
+
 def wrap_mangling_directive(base_directive, objtype):
     class directive(base_directive):
         def run(self):
@@ -198,8 +223,10 @@ def wrap_mangling_directive(base_directive, objtype):
 
             lines = list(self.content)
             mangle_docstrings(env.app, objtype, name, None, None, lines)
-            self.content = ViewList(lines, source=self.content.source(0),
-                                    parent=self.content.parent)
+            if self.content:
+                items = match_items(lines, self.content)
+                self.content = ViewList(lines, items=items,
+                                        parent=self.content.parent)
 
             return base_directive.run(self)
 
