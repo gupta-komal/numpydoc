@@ -200,11 +200,11 @@ def match_items(lines, content_old):
     j = 0
     for i, line in enumerate(lines):
         # go to next non-empty line in old:
-        # line.strip("") checks whether the string is all whitespace
-        while j < len(lines_old) - 1 and not lines_old[j].strip(" "):
+        # line.strip() checks whether the string is all whitespace
+        while j < len(lines_old) - 1 and not lines_old[j].strip():
             j += 1
         items_new.append(items_old[j])
-        if line.strip(" ") and j < len(lines_old) - 1:
+        if line.strip() and j < len(lines_old) - 1:
             j += 1
     assert(len(items_new) == len(lines))
     return items_new
