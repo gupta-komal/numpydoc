@@ -39,7 +39,6 @@ else:
 
 def mangle_docstrings(app, what, name, obj, options, lines,
                       reference_offset=[0]):
-
     cfg = {'use_plots': app.config.numpydoc_use_plots,
            'show_class_members': app.config.numpydoc_show_class_members,
            'show_inherited_class_members':
@@ -199,7 +198,8 @@ def wrap_mangling_directive(base_directive, objtype):
 
             lines = list(self.content)
             mangle_docstrings(env.app, objtype, name, None, None, lines)
-            self.content = ViewList(lines, self.content.parent)
+            self.content = ViewList(lines, source=self.content.source(0),
+                                    parent=self.content.parent)
 
             return base_directive.run(self)
 
