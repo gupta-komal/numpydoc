@@ -189,8 +189,10 @@ def match_items(lines, content_old):
     This tries to recover where a line in ``lines``
     came from before mangling.
 
-    It assumes that missing or new lines
-    are always empty.
+    It assumes that missing or new lines are always empty.
+    In reality, much more complicated things can happen, so
+    this function is only a very coarse heuristic and the
+    results are likely wrong, though possibly helpful as a guess.
     """
     items_new = []
     lines_old = content_old.data
