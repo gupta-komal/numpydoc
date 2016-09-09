@@ -185,23 +185,21 @@ class NumpyCDomain(ManglingDomainBase, CDomain):
 def match_items(lines, content_old):
     """Create items for mangled lines.
 
-    This function tries to match the lines in ``lines``
-    with the items (source file references and line numbers)
-    in ``content_old``. The ``mangle_docstrings`` function
-    changes the actual docstrings, but doesn't keep track of
-    where each line came from. The manging does many operations
+    This function tries to match the lines in ``lines`` with the items (source
+    file references and line numbers) in ``content_old``. The
+    ``mangle_docstrings`` function changes the actual docstrings, but doesn't
+    keep track of where each line came from. The manging does many operations
     on the original lines, which are hard to track afterwards.
 
-    Many of the line changes come from deleting or inserting
-    blank lines. This function tries to match lines by ignoring
-    blank lines. All other changes (such as inserting figures
-    or changes in the references) are compeltely ignored, so
-    the generated line numbers will be off if ``mangle_docstrings``
+    Many of the line changes come from deleting or inserting blank lines. This
+    function tries to match lines by ignoring blank lines. All other changes
+    (such as inserting figures or changes in the references) are compeltely
+    ignored, so the generated line numbers will be off if ``mangle_docstrings``
     does anything non-trivial.
 
-    This is a best-effort function and the real fix would be
-    to make ``mangle_docstrings`` actually keep track of the
-    ``items`` together with the ``lines``.
+    This is a best-effort function and the real fix would be to make
+    ``mangle_docstrings`` actually keep track of the ``items`` together with
+    the ``lines``.
 
     Examples
     --------
