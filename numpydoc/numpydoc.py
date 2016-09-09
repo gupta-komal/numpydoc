@@ -193,7 +193,7 @@ def match_items(lines, content_old):
 
     Many of the line changes come from deleting or inserting blank lines. This
     function tries to match lines by ignoring blank lines. All other changes
-    (such as inserting figures or changes in the references) are compeltely
+    (such as inserting figures or changes in the references) are completely
     ignored, so the generated line numbers will be off if ``mangle_docstrings``
     does anything non-trivial.
 
