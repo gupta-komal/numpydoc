@@ -29,7 +29,6 @@ if sphinx.__version__ < '1.0.1':
     raise RuntimeError("Sphinx 1.0.1 or newer is required")
 
 from .docscrape_sphinx import get_doc_object, SphinxDocString
-from sphinx.util.compat import Directive
 
 if sys.version_info[0] >= 3:
     sixu = lambda s: s
@@ -132,7 +131,7 @@ def setup(app, get_doc_object_=get_doc_object):
     # Extra mangling domains
     app.add_domain(NumpyPythonDomain)
     app.add_domain(NumpyCDomain)
-    
+
     metadata = {'parallel_read_safe': True}
     return metadata
 
@@ -184,15 +183,46 @@ class NumpyCDomain(ManglingDomainBase, CDomain):
 
 
 def match_items(lines, content_old):
-    """Create the right items for lines.
+    """Create items for mangled lines.
 
-    This tries to recover where a line in ``lines``
-    came from before mangling.
+    This function tries to match the lines in ``lines``
+    with the items (source file references and line numbers)
+    in ``content_old``. The ``mangle_docstrings`` function
+    changes the actual docstrings, but doesn't keep track of
+    where each line came from. The manging does many operations
+    on the original lines, which are hard to track afterwards.
 
-    It assumes that missing or new lines are always empty.
-    In reality, much more complicated things can happen, so
-    this function is only a very coarse heuristic and the
-    results are likely wrong, though possibly helpful as a guess.
+    Many of the line changes come from deleting or inserting
+    blank lines. This function tries to match lines by ignoring
+    blank lines. All other changes (such as inserting figures
+    or changes in the references) are compeltely ignored, so
+    the generated line numbers will be off if ``mangle_docstrings``
+    does anything non-trivial.
+
+    This is a best-effort function and the real fix would be
+    to make ``mangle_docstrings`` actually keep track of the
+    ``items`` together with the ``lines``.
+
+    Examples
+    --------
+    >>> lines = ['', 'A', '', 'B', '   ', '', 'C', 'D']
+    >>> lines_old = ['a', '', '', 'b', '', 'c']
+    >>> items_old = [('file1.py', 0), ('file1.py', 1), ('file1.py', 2),
+    ...              ('file2.py', 0), ('file2.py', 1), ('file2.py', 2)]
+    >>> content_old = ViewList(lines_old, items=items_old)
+    >>> match_items(lines, content_old) # doctest: +NORMALIZE_WHITESPACE
+    [('file1.py', 0), ('file1.py', 0), ('file2.py', 0), ('file2.py', 0),
+     ('file2.py', 2), ('file2.py', 2), ('file2.py', 2), ('file2.py', 2)]
+    >>> # first 2 ``lines`` are matched to 'a', second 2 to 'b', rest to 'c'
+    >>> # actual content is completely ignored.
+
+    Notes
+    -----
+    The algorithm tries to match any line in ``lines`` with one in
+    ``lines_old``.  It skips over all empty lines in ``lines_old`` and assigns
+    this line number to all lines in ``lines``, unless a non-empty line is
+    found in ``lines`` in which case it goes to the next line in ``lines_old``.
+
     """
     items_new = []
     lines_old = content_old.data
